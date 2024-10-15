@@ -16,7 +16,7 @@ import type { NavigateOptions, ParsePathParams, ToMaskOptions } from './link'
 import type { ParsedLocation } from './location'
 import type { RouteById, RouteIds, RoutePaths } from './routeInfo'
 import type { AnyRouter, RegisteredRouter, Router } from './router'
-import type { Assign, Constrain, Expand, NoInfer, PickRequired } from './utils'
+import type { Assign, Constrain, Expand, NoInfer } from './utils'
 import type { BuildLocationFn, NavigateFn } from './RouterProvider'
 import type { NotFoundError } from './not-found'
 import type { LazyRoute } from './fileRoute'
@@ -338,13 +338,20 @@ export interface UpdatableRouteOptions<
   preload?: boolean
   preloadStaleTime?: number
   preloadGcTime?: number
-  // Filter functions that can manipulate search params *before* they are passed to links and navigate
-  // calls that match this route.
+  search?: {
+    middlewares?: Array<
+      SearchMiddleware<ResolveFullSearchSchema<TParentRoute, TSearchValidator>>
+    >
+  }
+  /** 
+  @deprecated Use search.middlewares instead
+  */
   preSearchFilters?: Array<
     SearchFilter<ResolveFullSearchSchema<TParentRoute, TSearchValidator>>
   >
-  // Filter functions that can manipulate search params *after* they are passed to links and navigate
-  // calls that match this route.
+  /** 
+  @deprecated Use search.middlewares instead
+  */
   postSearchFilters?: Array<
     SearchFilter<ResolveFullSearchSchema<TParentRoute, TSearchValidator>>
   >
@@ -555,6 +562,15 @@ export interface LoaderFnContext<
 }
 
 export type SearchFilter<TInput, TResult = TInput> = (prev: TInput) => TResult
+
+export type SearchMiddlewareContext<TSearchSchema> = {
+  search: TSearchSchema
+  next: (newSearch: TSearchSchema) => TSearchSchema
+}
+
+export type SearchMiddleware<TSearchSchema> = (
+  ctx: SearchMiddlewareContext<TSearchSchema>,
+) => TSearchSchema
 
 export type ResolveId<
   TParentRoute,
