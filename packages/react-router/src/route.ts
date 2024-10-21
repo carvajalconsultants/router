@@ -340,7 +340,9 @@ export interface UpdatableRouteOptions<
   preloadGcTime?: number
   search?: {
     middlewares?: Array<
-      SearchMiddleware<ResolveFullSearchSchema<TParentRoute, TSearchValidator>>
+      SearchMiddleware<
+        ResolveFullSearchSchemaInput<TParentRoute, TSearchValidator>
+      >
     >
   }
   /** 
@@ -945,6 +947,7 @@ export class Route<
   rank!: number
   lazyFn?: () => Promise<LazyRoute<any>>
   _lazyPromise?: Promise<void>
+  _componentsPromise?: Promise<Array<void>>
 
   /**
    * @deprecated Use the `createRoute` function instead.
